@@ -25,14 +25,22 @@ pipeline {
        //         }
        //     }
       //  }
-	stage("Publish to Nexus Repository Manager") {
-            steps {
-                script {
-                   nexusPublisher nexusInstanceId: 'Nexus-Repository', nexusRepositoryId: 'devops-usach-nexus', 
-			packages: [[$class: 'MavenPackage', mavenAssetList: [[classifier: '', extension: '', filePath: "${workspace}/build/DevOpsUsach2020-0.0.1.jar"]],
-		        mavenCoordinate: [artifactId: 'DevOpsUsach2020', groupId: 'com.devopsusach2020', packaging: 'jar', version: '1.0.0']]]
-                }
+// 	stage("Publish to Nexus Repository Manager") {
+//             steps {
+//                 script {
+//                    nexusPublisher nexusInstanceId: 'Nexus-Repository', nexusRepositoryId: 'devops-usach-nexus', 
+// 			packages: [[$class: 'MavenPackage', mavenAssetList: [[classifier: '', extension: '', filePath: "${WORKSPACE}/build/DevOpsUsach2020-0.0.1.jar"]],
+// 		        mavenCoordinate: [artifactId: 'DevOpsUsach2020', groupId: 'com.devopsusach2020', packaging: 'jar', version: '1.0.0']]]
+//                 }
+//             }
+//         }  
+	stage('Pull the file off Nexus'){
+           steps{
+            withCredentials([usernameColonPassword(credentialsId: 'admin-nexus', variable: 'NEXUS_CREDENTIALS')]){
+                sh script: 'curl -u ${NEXUS_CREDENTIALS} -o DevOpsUsach2020-0.0.1.jar "http://nexus:8081/repository/devops-usach-nexus/com/devopsusach2020/DevOpsUsach2020/0.0.1/DevOpsUsach2020-0.0.1.jar"'
             }
+          }
+               
         }      
         stage('Clean Workspace') {
             steps {
